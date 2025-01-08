@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
+import cors from "cors"; // Import cors
+
 dotenv.config();
 
 mongoose
@@ -18,6 +20,7 @@ mongoose
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: "http://localhost:5173", credentials: true })); // Use cors middleware
 
 app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");
