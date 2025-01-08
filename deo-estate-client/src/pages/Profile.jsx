@@ -11,9 +11,12 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
-  deleteUserSuccess,
   deleteUserStart,
+  deleteUserSuccess,
   deleteUserFailure,
+  signoutUserStart,
+  signoutUserSuccess,
+  signoutUserFailure,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 
@@ -67,17 +70,14 @@ export default function Profile() {
 
     try {
       dispatch(updateUserStart());
-      const res = await fetch(
-        `http://localhost:3000/api/user/update/${currentUser._id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+        credentials: "include",
+      });
       const data = await res.json();
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
@@ -94,13 +94,10 @@ export default function Profile() {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(
-        `http://localhost:3000/api/user/delete/${currentUser._id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       const data = await res.json();
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
@@ -109,6 +106,21 @@ export default function Profile() {
       dispatch(deleteUserSuccess());
     } catch (err) {
       dispatch(deleteUserFailure(err.message));
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      dispatch(signoutUserStart());
+      const res = await fetch("/api/auth/signout");
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signoutUserFailure(data.message));
+        return;
+      }
+      dispatch(signoutUserSuccess());
+    } catch (err) {
+      dispatch(signoutUserFailure(err.message));
     }
   };
 
@@ -179,7 +191,9 @@ export default function Profile() {
         >
           Delete account
         </span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span onClick={handleSignout} className="text-red-700 cursor-pointer">
+          Sign out
+        </span>
       </div>
 
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
